@@ -1,0 +1,2 @@
+- name: Refresh docker
+  shell: "systemctl daemon-reload && systemctl restart docker"

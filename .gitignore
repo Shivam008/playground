@@ -1,0 +1,17 @@
+# python
+__pycache__/
+*.py[cod]
+
+# virtualenv
+venv
+
+# vagrant
+.vagrant
+
+# ansible
+inventory
+ssh.config
+ansible.cfg
+.vagrant_cache
+*.retry
+debug.yml

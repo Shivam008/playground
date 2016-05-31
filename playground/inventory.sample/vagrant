@@ -1,0 +1,20 @@
+## inventory file for vagrant machines
+core-01 ansible_ssh_host=172.17.8.101
+
+[web]
+core-01
+
+[coreos]
+core-01
+
+[coreos:vars]
+ansible_ssh_user=core
+ansible_python_interpreter="PATH=/home/core/bin:$PATH python"
+# pip_mirror=""
+# write your registry mirror here if needed
+# docker_registry_mirror=""
+# will try to pull base image before build
+# gimb_from=""
+# thrak_from=""
+# run thrak in debug mode
+# thrak_debug="true"

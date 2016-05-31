@@ -1,0 +1,4 @@
+[global]
+{% if pip_mirror | default(False) %}
+index-url = {{ pip_mirror }}
+{% endif %}

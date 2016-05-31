@@ -1,0 +1,12 @@
+- name: Build thrak
+  hosts: coreos
+  tasks:
+    - name: pull python image
+      shell: docker pull {{ thrak_from }}
+      ignore_errors: True
+
+    - name: build thrak image
+      docker_image:
+        path="/opt/playground/thrak"
+        name="dockerlab/thrak"
+        state=build

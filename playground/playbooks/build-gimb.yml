@@ -1,0 +1,12 @@
+- name: Build gimb
+  hosts: coreos
+  tasks:
+    - name: pull python image
+      shell: docker pull {{ gimb_from }}
+      ignore_errors: True
+
+    - name: build gimb image
+      docker_image:
+        path="/opt/playground/gimb"
+        name="dockerlab/gimb"
+        state=build

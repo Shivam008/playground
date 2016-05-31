@@ -1,0 +1,13 @@
+- name: Restart gimb
+  hosts: coreos
+  tasks:
+    - name: start a gimb container
+      register: gimb_container_out
+      docker:
+        image: dockerlab/gimb
+        state: restarted
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        env:
+          ETCD_HOST: "{{ ansible_eth0.ipv4.address }}"
+          PUBLIC_HOST: "{{ ansible_eth1.ipv4.address }}"

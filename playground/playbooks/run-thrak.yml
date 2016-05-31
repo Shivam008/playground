@@ -1,0 +1,15 @@
+- name: Restart thrak
+  hosts: coreos
+  tasks:
+    - name: start a thrak container
+      register: thrak_container_out
+      docker:
+        image: dockerlab/thrak
+        state: restarted
+        publish_all_ports: yes
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        env:
+          ETCD_HOST: "{{ ansible_eth0.ipv4.address }}"
+          PUBLIC_HOST: "{{ ansible_eth1.ipv4.address }}"
+          DEBUG: "{{ thrak_debug }}"

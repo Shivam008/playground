@@ -1,0 +1,4 @@
+docker-py==1.8.1
+python-etcd==0.4.3
+Flask==0.10.1
+Flask-RESTful==0.3.5

@@ -1,0 +1,12 @@
+- name: Bootstrap coreos hosts
+  hosts: coreos
+  gather_facts: False
+  roles:
+    - coreos-bootstrap
+
+- name: Setting docker opts
+  hosts: coreos
+  become: yes
+  become_user: root
+  roles:
+    - coreos-docker-opts

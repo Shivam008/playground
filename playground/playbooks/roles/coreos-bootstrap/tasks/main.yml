@@ -1,0 +1,45 @@
+- name: Check if bootstrap is needed
+  raw: stat $HOME/.bootstrapped
+  register: need_bootstrap
+  ignore_errors: True
+
+- name: Run bootstrap.sh
+  script: bootstrap.sh
+  when: need_bootstrap | failed
+
+- name: Check if we need to install pip
+  shell: "~/bin/pip --version"
+  register: need_pip
+  ignore_errors: True
+  changed_when: false
+
+- name: Copy get-pip.py
+  get_url: >
+    url=http://7xi756.com1.z0.glb.clouddn.com/get-pip.py
+    dest=~/get-pip.py
+  when: need_pip | failed
+
+- name: Set up pip conf directory
+  file: path=~/.pip state=directory
+
+- name: Set up pip conf
+  template: >
+    src=templates/pip.conf.j2
+    dest=~/.pip/pip.conf
+
+- name: Install pip
+  shell: "{{ansible_python_interpreter}} ~/get-pip.py"
+  when: need_pip | failed
+
+- name: Remove get-pip.py
+  file: path=~/get-pip.py state=absent
+  when: need_pip | failed
+
+- name: Install pip launcher
+  copy: src=runner dest=~/bin/pip mode=0755
+  when: need_pip | failed
+
+- name: Install docker-py
+  pip: >
+    name=docker-py
+    extra_args='-i {{ pip_mirror | default("https://pypi.python.org/simple/") }}'

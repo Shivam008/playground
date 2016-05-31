@@ -1,0 +1,5 @@
+- name: Copy flannel_docker_opts.env
+  template: >
+    src=templates/flannel_docker_opts.env.j2
+    dest=/run/flannel_docker_opts.env
+  notify: Refresh docker
