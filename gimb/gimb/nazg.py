@@ -97,8 +97,25 @@ class Container(object):
         base_url = docker_base_url or DOCKER_BASE_URL
         return cls(container_id, get_docker_client(base_url))
 
+    @classmethod
+    def create(cls, docker_base_url=None, **kwargs):
+        base_url = docker_base_url or DOCKER_BASE_URL
+        client = get_docker_client(base_url)
+        host_config = client.create_host_config(port_bindings={
+            int(port): None for port in kwargs.get('ports', [])})
+        container = client.create_container(host_config=host_config, **kwargs)
+        client.start(container.get('Id'))
+        return cls(container.get('Id'), client)
+
     def get_inspect_info(self):
         return self._docker.inspect_container(self.id)
+
+    def iter_service_ports(self):
+        for port_setting in self.inspect_info['NetworkSettings']['Ports'].values():
+            for mapping in port_setting:
+                public_port = mapping.get('HostPort')
+                if public_port is not None:
+                    yield int(public_port)
 
     def delete(self):
         self._docker.stop(self.id)

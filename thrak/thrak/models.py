@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import os
+import time
 from nazg import EtcdConf, Container
 
 DOCKER_BASE_URL = 'tcp://{host}:%s' % os.getenv('DOCKER_PORT', 2375)
@@ -35,8 +36,20 @@ class Service(object):
                 yield cls(service)
 
     @classmethod
-    def create(cls, host, image, **kwargs):
-        return Container.creaet(host, image, **kwargs)
+    def create(cls, host, **kwargs):
+        docker_base_url = DOCKER_BASE_URL.format(host=host)
+        container = Container.create(docker_base_url, **kwargs)
+
+        services = []
+        for public_port in container.iter_service_ports():
+            while True:
+                try:
+                    services.append(cls.get(host, public_port))
+                    break
+                except ServiceDoesNotExist:
+                    time.sleep(1)
+
+        return services
 
     def delete(self, host, port):
         container_id = self.get(host, port).container_id

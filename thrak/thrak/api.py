@@ -12,6 +12,11 @@ app = Flask(__name__)
 api = restful.Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('name', type=str)
+parser.add_argument('image', type=str)
+parser.add_argument('command', type=str)
+parser.add_argument('ports', type=int, action='append')
+parser.add_argument('environment', type=str, action='append')
+parser.add_argument('labels', type=str, action='append')
 
 
 def get_service_or_404(host, port):
@@ -23,6 +28,7 @@ def get_service_or_404(host, port):
 
 
 class ServiceResource(restful.Resource):
+
     def get(self, host, port):
         return get_service_or_404(host, port).data
 
@@ -32,27 +38,20 @@ class ServiceResource(restful.Resource):
         # TODO better to use 202 with async
         return '', 204
 
-    # TODO
-    def put(self, service_id):
-        restful.abort(404, message="API not finish yet")
-        args = parser.parse_args()
-        service = {'name': args['name']}
-        Service.create(service_id, service)
-        return service.data, 201
-
 
 class ServiceListResource(restful.Resource):
     def get(self, host):
         return list(s.data for s in Service.get_by_host(host))
 
-    # TODO
-    def post(self):
-        restful.abort(404, message="API not finish yet")
+    def post(self, host):
+        '''Example:
+            image="jupyter-test",
+            environment=["PASSWORD=admin"]
+            ports=[8888],
+        '''
         args = parser.parse_args()
-        service_id = int(max(SERVICES.keys()).lstrip('service_id_')) + 1
-        service_id = 'service_id_%i' % service_id
-        SERVICES[service_id] = {'task': args['task']}
-        return SERVICES[service_id], 201
+        services = Service.create(host, **args)
+        return list(s.data for s in services), 201
 
 
 if __name__ == '__main__':
