@@ -1,3 +1,7 @@
+- name: Copy docker.service
+  shell: "cp /usr/lib/systemd/system/docker.service /etc/systemd/system"
+  notify: Refresh docker
+
 - name: Copy flannel_docker_opts.env
   template: >
     src=templates/flannel_docker_opts.env.j2

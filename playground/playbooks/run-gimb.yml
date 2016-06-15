@@ -1,6 +1,11 @@
 - name: Restart gimb
   hosts: coreos
   tasks:
+    - name: start etcd
+      become: yes
+      become_user: root
+      service: name=etcd state=started
+
     - name: start a gimb container
       register: gimb_container_out
       docker:

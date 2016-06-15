@@ -62,7 +62,18 @@ services/
             services_path=ETCD_SERVICES_PATH,
             host=host,
         )
-        for service in self.client.read(host_key).leaves:
+
+        try:
+            services = self.client.read(host_key)
+        # stop iterator while no /sevices directory
+        except etcd_api.EtcdKeyNotFound:
+            raise StopIteration
+
+        # stop iterator while no sevices
+        if services.value is None:
+            raise StopIteration
+
+        for service in services.leaves:
             yield self.loads_service_attributes(service.key)
 
     def create_service(self, ttl, port, host=PUBLIC_HOST, **extra):
